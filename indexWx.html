@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <title>友客户</title>
+  </head>
+  <body>
+    <noscript>
+      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <div id="app">
+        <button id="clickVideo">开始视频</button>
+        <video id="video"></video>
+    </div>
+    <!-- built files will be auto injected -->
+    <script>
+        function getUserMedia(constraints,callback) {
+            navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia ||
+                navigator.msGetUserMedia || window.getUserMedia;
+            if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                console.log('1');
+                navigator.mediaDevices.getUserMedia(constraints).then(function(stream) {
+                    console.log(stream);
+                    callback(false, stream);
+                })['catch'](function(err) {
+                    console.log(err);
+                    callback(err);
+                });
+            } else if(navigator.getUserMedia) {
+                console.log('2');
+                navigator.getUserMedia(constraints, function(stream) {
+                callback(false, stream);
+                }, function(err) {
+                callback(err);
+                });
+            } else {
+                callback(new Error('Not support userMedia'));
+            }
+        };
+        var constraints = { 
+            audio: false,
+            video: { 
+                deviceId: "default",
+                facingMode: "user" //调用前置摄像头
+            } 
+        };
+        
+
+        document.getElementById('clickVideo').addEventListener('click', () => {
+            getUserMedia(constraints, (status, stream) => {
+                console.log('123123123');
+                console.log(stream);
+            })
+        });
+    </script>
+  </body>
+</html>
