@@ -50,8 +50,13 @@
 
         document.getElementById('clickVideo').addEventListener('click', () => {
             getUserMedia(constraints, (status, stream) => {
-                console.log('123123123');
-                console.log(stream);
+                const webcamElement = document.getElementById('video');
+                webcamElement.playsInline = true;
+                webcamElement.srcObject = stream;
+                webcamElement.play();
+                webcamElement.addEventListener( "loadeddata",() => {
+                    console.log('loadeddata');
+                } , false );
             })
         });
     </script>
