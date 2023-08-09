@@ -17,7 +17,10 @@
 		import { MindARThree } from 'mindar-face-three';
 		const mindarThree = new MindARThree({
 			container: document.querySelector("#container"),
+			preserveDrawingBuffer: true
 		});
+		const data = [];
+		let recorder = null;
 		const { renderer, scene, camera } = mindarThree;
 		const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
 		scene.add(light);
@@ -35,6 +38,9 @@
 		}
 		const startButton = document.querySelector("#startButton");
 		const stopButton = document.querySelector("#stopButton");
+		// const saveRender = document.querySelector("#saveRender");
+		// const stopRender = document.querySelector("#stopRender");
+		const saveImage = document.querySelector("#saveImage");
     startButton.addEventListener("click", () => {
       start();
     });
@@ -42,6 +48,55 @@
       mindarThree.stop();
       mindarThree.renderer.setAnimationLoop(null);
     });
+		// saveRender.addEventListener("click", () => {
+		// 	// console.log(renderer.domElement)
+		// 	// const dataImg = new Image();
+		// 	const stream = renderer.domElement.captureStream();
+		// 	console.log(stream);
+		// 	recorder = new MediaRecorder(stream, { mimeType: 'video/mp4' });
+		// 	recorder.ondataavailable = function (event) {
+		// 		console.log(event);
+		// 		if (event.data && event.data.size) {
+		// 			data.push(event.data);
+		// 		}
+		// 	};
+		// 	recorder.onstop = () => {
+		// 		console.log('stoped');
+		// 		const url = URL.createObjectURL(new Blob(data, { type: 'video/mp4' }));
+		// 		console.log(url);
+		// 		document.querySelector("#showVideo").style.display = "block";
+		// 		document.querySelector("#showVideo").src = url;
+		// 		document.querySelector("#showVideo").play();
+		// 	};
+		// 	recorder.start();
+		// });
+		// stopRender.addEventListener("click", () => {
+		// 	console.log('onstop');
+		// 	recorder.stop();
+		// });
+		saveImage.addEventListener("click", () => {
+			const canvas = renderer.domElement;
+			renderer.render(scene, camera);
+			const imgUrl = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+			saveVideo(imgUrl);
+		});
+
+		const saveVideo = (imgData) => {
+			const video = document.getElementsByTagName('video')[0];
+			console.log(video);
+			const canvas = window.canvas = document.createElement("canvas");
+			canvas.width = video.videoWidth;
+			canvas.height = video.videoHeight; 
+			canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);  // 图片大小和视频分辨率一致
+			const img = new Image();
+			img.src = imgData;
+			img.onload = () => {
+				canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);  // 图片大小和视频分辨率一致
+				const base64 = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+				const newImage = document.getElementById('imgShow');
+				newImage.src = base64;
+			}
+		}
 	</script>
 	<style>
 		body {
@@ -61,7 +116,17 @@
 	<div id="control">
     <button id="startButton">Start</button>
     <button id="stopButton">Stop</button>
+		<!-- <button id="saveRender">开始视频录制</button>
+		<button id="stopRender">结束视频录制</button> -->
+		<button id="saveImage">截图</button>
   </div>
+	<!-- <div>
+		<video id="showVideo"></video>
+	</div> -->
+	<div>
+		长按保存
+		<img id="imgShow" />
+	</div>
 	<div id="container">
 	</div>
 </body>
